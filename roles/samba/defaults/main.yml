@@ -1,0 +1,56 @@
+---
+# Samba global configuration
+samba_workgroup: WORKGROUP
+samba_server_string: "Samba Server %h"
+samba_log_file: /var/log/samba/log.%m
+samba_max_log_size: 1000
+samba_security: user
+samba_passdb_backend: tdbsam
+
+# Package names by distribution
+samba_debian_packages:
+  - samba
+  - samba-common
+  - python3-passlib
+
+samba_redhat_packages:
+  - samba
+  - samba-common
+  - python3-passlib
+  - python3-setproctitle
+
+# Define default shares
+samba_shares:
+  - name: public
+    path: /srv/samba/public
+    browsable: "yes"  # Keep these as strings since Samba config uses "yes"/"no" strings
+    writable: "yes"
+    guest_ok: "yes"
+    create_mask: "0775"
+    directory_mask: "0775"
+  - name: private
+    path: /srv/samba/private
+    browsable: "yes"
+    writable: "yes"
+    guest_ok: "no"
+    valid_users: "@smbusers"
+    create_mask: "0770"
+    directory_mask: "0770"
+
+# Define user groups (with optional GID)
+samba_groups:
+  - name: smbusers
+    # gid: 5000  # Uncomment and set if you want a specific GID
+
+# Define users
+samba_users: []
+# Example user structure with UID:
+# samba_users:
+#   - name: alice
+#     uid: 10001  # Specific UID for alice
+#     password: "SecurePass123"
+#     groups: ["smbusers"]
+#     samba_password: "SecurePass123"
+#     home: "/home/alice"  # Optional home directory path
+#     shell: "/bin/bash"   # Optional shell
+#     comment: "Alice User Account"  # Optional comment/description

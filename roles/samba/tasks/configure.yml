@@ -1,0 +1,20 @@
+---
+- name: Create Samba directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: '0775'
+    owner: root
+    group: root
+  loop: "{{ samba_shares }}"
+
+- name: Configure smb.conf
+  template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: 
+    - Restart Samba
+    - Restart Nmbd

@@ -1,0 +1,36 @@
+---
+# For Debian/Ubuntu systems
+- name: Update apt cache (Debian/Ubuntu)
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Install Samba packages (Debian/Ubuntu)
+  apt:
+    name: "{{ samba_debian_packages }}"
+    state: present
+  when: ansible_os_family == "Debian"
+
+# For CentOS/RHEL systems
+- name: Enable EPEL repository (CentOS/RHEL)
+  dnf:
+    name: epel-release
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Install Samba packages (CentOS/RHEL)
+  dnf:
+    name: "{{ samba_redhat_packages }}"
+    state: present
+  when: ansible_os_family == "RedHat"
+
+# Start and enable services (cross-platform)
+- name: Enable and start Samba services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - "{{ 'smbd' if ansible_os_family == 'Debian' else 'smb' }}"
+    - "{{ 'nmbd' if ansible_os_family == 'Debian' else 'nmb' }}"

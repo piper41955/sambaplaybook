@@ -1,0 +1,48 @@
+---
+- name: Create user groups if they don't exist
+  group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid | default(omit) }}"
+    state: present
+  loop: "{{ samba_groups }}"
+  when: samba_groups | length > 0
+
+- name: Create system users
+  user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid | default(omit) }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+    state: present
+    groups: "{{ item.groups | default([]) }}"
+    append: "{{ item.append | default(true) }}"
+    home: "{{ item.home | default(omit) }}"
+    shell: "{{ item.shell | default(omit) }}"
+    comment: "{{ item.comment | default(omit) }}"
+    system: "{{ item.system | default(omit) }}"
+  loop: "{{ samba_users }}"
+  when: samba_users | length > 0
+
+# Check if smbpasswd exists
+- name: Check if smbpasswd exists
+  command: which smbpasswd
+  register: smbpasswd_check
+  changed_when: false
+  failed_when: false
+
+- name: Add Samba users
+  shell: "(echo '{{ item.samba_password }}'; echo '{{ item.samba_password }}') | smbpasswd -s -a {{ item.name }}"
+  loop: "{{ samba_users }}"
+  no_log: true
+  when: 
+    - samba_users | length > 0
+    - smbpasswd_check.rc is defined
+    - smbpasswd_check.rc == 0
+  register: samba_user_add
+
+- name: Enable Samba users
+  command: smbpasswd -e {{ item.name }}
+  loop: "{{ samba_users }}"
+  when: 
+    - samba_users | length > 0
+    - smbpasswd_check.rc is defined
+    - smbpasswd_check.rc == 0

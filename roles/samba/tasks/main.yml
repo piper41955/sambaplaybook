@@ -1,0 +1,16 @@
+---
+- name: Include install tasks
+  import_tasks: install.yml
+  tags: [samba, install]
+
+- name: Include configure tasks
+  import_tasks: configure.yml
+  tags: [samba, configure]
+
+- name: Include user management tasks
+  import_tasks: users.yml
+  tags: [samba, users]
+
+- name: Configure firewall for Samba
+  import_tasks: firewall.yml
+  tags: [samba, configure, firewall]

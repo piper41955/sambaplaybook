@@ -1,0 +1,35 @@
+---
+# Add any custom variables that should override defaults here
+samba_packages:
+  - samba
+  - samba-common
+  - python3-passlib
+
+samba_groups:
+  - name: smbusers
+    gid: 5000
+  - name: sambashare
+    gid: 5001
+
+samba_users:
+  - name: alice
+    uid: 10001
+    password: "SecurePass123"
+    groups: ["smbusers", "sambashare"]
+    samba_password: "SecurePass123"
+    home: "/home/alice"
+    shell: "/bin/bash"
+    comment: "Alice Samba User"
+  - name: bob
+    uid: 10002
+    password: "AnotherPass456"
+    groups: ["smbusers"]
+    samba_password: "AnotherPass456"
+    home: "/home/bob"
+    shell: "/bin/bash"
+    comment: "Bob Samba User"
+  - name: carol
+    uid: 10003
+    password: "StrongP@ss789"
+    groups: ["sambashare"]
+    samba_password: "StrongP@ss789"

@@ -1,0 +1,55 @@
+---
+# For Debian/Ubuntu
+- name: Check if UFW is installed (Debian/Ubuntu)
+  command: which ufw
+  register: ufw_check
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "Debian"
+
+- name: Set UFW presence fact
+  set_fact:
+    ufw_installed: "{{ ufw_check.rc is defined and ufw_check.rc == 0 }}"
+  when: ansible_os_family == "Debian"
+
+- name: Configure UFW for Samba (Debian/Ubuntu) - using shell instead of ufw module
+  shell: |
+    ufw allow 137/udp
+    ufw allow 138/udp
+    ufw allow 139/tcp
+    ufw allow 445/tcp
+    ufw allow from any to any app Samba || ufw allow Samba
+  when: 
+    - ansible_os_family == "Debian"
+    - ufw_installed | bool
+
+# For CentOS/RHEL using firewalld
+- name: Check if firewalld is installed (CentOS/RHEL)
+  command: which firewall-cmd
+  register: firewalld_check
+  changed_when: false
+  failed_when: false
+  when: ansible_os_family == "RedHat"
+
+- name: Set firewalld presence fact
+  set_fact:
+    firewalld_installed: "{{ firewalld_check.rc is defined and firewalld_check.rc == 0 }}"
+  when: ansible_os_family == "RedHat"
+
+- name: Configure firewalld for Samba (CentOS/RHEL)
+  command: "{{ item }}"
+  loop:
+    - firewall-cmd --permanent --add-service=samba
+    - firewall-cmd --permanent --add-service=samba-client
+    - firewall-cmd --reload
+  when: 
+    - ansible_os_family == "RedHat"
+    - firewalld_installed | bool
+
+# Set defaults for ufw and firewalld installed status if not defined
+- name: Set default values for firewall status
+  set_fact:
+    ufw_installed: "{{ ufw_installed | default(false) }}"
+    firewalld_installed: "{{ firewalld_installed | default(false) }}"
+
+# Alternative approach for systems without ufw or firewalld - using iptable

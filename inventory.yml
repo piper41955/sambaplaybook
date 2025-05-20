@@ -1,0 +1,8 @@
+---
+samba_servers:
+  hosts:
+    samba01:
+      ansible_host: localhost
+      ansible_user: dchait
+      ansible_password: aic11aic
+      ansible_become_pass: aic11aic

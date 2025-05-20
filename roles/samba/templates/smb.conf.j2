@@ -1,0 +1,41 @@
+# Global Samba configuration
+[global]
+   workgroup = {{ samba_workgroup }}
+   server string = {{ samba_server_string }}
+   log file = {{ samba_log_file }}
+   max log size = {{ samba_max_log_size }}
+   logging = file
+   panic action = /usr/share/samba/panic-action %d
+   server role = standalone server
+   obey pam restrictions = yes
+   unix password sync = yes
+   passwd program = /usr/bin/passwd %u
+   passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+   pam password change = yes
+   map to guest = bad user
+   usershare allow guests = yes
+   security = {{ samba_security }}
+   passdb backend = {{ samba_passdb_backend }}
+
+{% for share in samba_shares %}
+[{{ share.name }}]
+   path = {{ share.path }}
+   browsable = {{ share.browsable }}
+   writable = {{ share.writable }}
+   guest ok = {{ share.guest_ok }}
+{% if share.valid_users is defined %}
+   valid users = {{ share.valid_users }}
+{% endif %}
+{% if share.write_list is defined %}
+   write list = {{ share.write_list }}
+{% endif %}
+{% if share.read_only is defined %}
+   read only = {{ share.read_only }}
+{% endif %}
+{% if share.create_mask is defined %}
+   create mask = {{ share.create_mask }}
+{% endif %}
+{% if share.directory_mask is defined %}
+   directory mask = {{ share.directory_mask }}
+{% endif %}
+{% endfor %}
