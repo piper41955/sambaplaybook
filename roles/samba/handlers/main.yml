@@ -1,10 +1,20 @@
 ---
-- name: Restart Samba
+- name: Restart Samba - debian
   service:
     name: smbd
     state: restarted
 
-- name: Restart Nmbd
+- name: Restart Nmbd - debian
   service:
     name: nmbd
+    state: restarted
+
+- name: Restart Samba - redhat
+  service:
+    name: smb
+    state: restarted
+
+- name: Restart Nmbd - redhat
+  service:
+    name: nmb
     state: restarted
