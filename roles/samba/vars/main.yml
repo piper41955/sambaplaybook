@@ -28,8 +28,3 @@ samba_users:
     home: "/home/bob"
     shell: "/bin/bash"
     comment: "Bob Samba User"
-  - name: carol
-    uid: 10003
-    password: "StrongP@ss789"
-    groups: ["sambashare"]
-    samba_password: "StrongP@ss789"
